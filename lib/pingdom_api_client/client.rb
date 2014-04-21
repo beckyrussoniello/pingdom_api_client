@@ -1,4 +1,4 @@
-class Client << HTTPClient
+class Client < HTTPClient
 	BASE_URL = "https://api.pingdom.com/api/2.0/"
 	
 	attr_accessor :email, :password, :api_key, :agent_name
@@ -13,7 +13,7 @@ class Client << HTTPClient
 
 	[:get, :post, :put, :delete].each do |method|
 		eval %Q{
-			def #{method}(path, query)
+			def #{method}_request(path, query)
 				web_request(:#{method}, path, query)
 			end
 		}

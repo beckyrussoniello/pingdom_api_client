@@ -1,4 +1,4 @@
-require "httpclient"
+require "httparty"
 require "json"
 require "pingdom_api_client/version"
 require "pingdom_api_client/helpers"

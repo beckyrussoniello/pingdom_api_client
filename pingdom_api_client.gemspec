@@ -17,9 +17,10 @@ Gem::Specification.new do |s|
   s.files = Dir["{lib}/**/*"] #+ ["MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["spec/**/*"]
 
-  s.add_dependency "httpclient"
+  s.add_dependency "httparty"
   s.add_dependency "google-adwords-api", "~> 0.12.0"
 
   s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'timecop'
+	s.add_development_dependency 'webmock'
 end

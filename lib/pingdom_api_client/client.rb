@@ -1,15 +1,14 @@
 module PingdomApiClient
-	class Client < HTTPClient
-		BASE_URL = "https://api.pingdom.com/api/2.0/"
+	class Client
+		include HTTParty
+		base_uri "https://api.pingdom.com/api/2.0/"
 	
 		attr_accessor :email, :password, :api_key, :agent_name
 
 		def initialize(email, password, api_key, agent_name = "Pingdom API Client")
-			@email = email
-			@password = password
+			@auth = {username: email, password: password}
 			@api_key = api_key
-			super(agent_name: agent_name)
-			set_auth(BASE_URL, email, password)
+			@headers = {"User-Agent" => agent_name, 'App-Key' => api_key}
 		end
 
 		[:get, :post, :put, :delete].each do |method|
@@ -21,16 +20,12 @@ module PingdomApiClient
 		end
 
 		def web_request(method, path, query)
-			response = send(method, BASE_URL + path, query, extheader)
+			response = self.class.send(method, path, {basic_auth: @auth, headers: @headers})
 			body = JSON.parse(response.body)
 			unless response.code == 200
 				raise(PingdomApiClient::ApiError, "#{response.code}: #{body['error']['errormessage']}")
 			end
 			body
-		end
-
-		def extheader
-			@extheader ||= { 'App-Key' => api_key }
 		end
 	end
 end

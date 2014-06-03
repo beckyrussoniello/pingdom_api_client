@@ -20,7 +20,7 @@ module PingdomApiClient
 		end
 
 		def web_request(method, path, query)
-			response = self.class.send(method, path, {basic_auth: @auth, headers: @headers})
+			response = self.class.send(method, path, {basic_auth: @auth, headers: @headers, query: query})
 			body = JSON.parse(response.body)
 			unless response.code == 200
 				raise(PingdomApiClient::ApiError, "#{response.code}: #{body['error']['errormessage']}")

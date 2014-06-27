@@ -156,4 +156,99 @@ describe PingdomApiClient::Client do
 			@pingdom_client.delete_request(@path, @query)
 		end
 	end
+
+	describe "#list_all_checks" do
+		before :each do
+			@fake_checks = ["check1", "check2"]
+			@fake_response = {"checks" => @fake_checks}
+			@pingdom_client.stub(:get_request).and_return(@fake_response)
+			@checks_path = "checks"
+			@pingdom_client.stub(:checks_path).and_return(@checks_path)
+		end
+
+		it "calls #get_request" do
+			@pingdom_client.should_receive(:get_request).and_return(@fake_response)
+			@pingdom_client.list_all_checks
+		end
+
+		it "calls #checks_path" do
+			@pingdom_client.should_receive(:checks_path).and_return(@checks_path)
+			@pingdom_client.list_all_checks
+		end
+
+		it "passes the return value of #checks_path as the first argument to #get_request" do
+			@pingdom_client.should_receive(:get_request).with do |*args|
+				args[0].should eq(@checks_path)
+			end
+			@pingdom_client.list_all_checks
+		end
+
+		it "passes a hash as the second parameter to #get_request" do
+			@pingdom_client.should_receive(:get_request).with do |*args|
+				args[1].should be_an_instance_of(Hash)
+			end
+			@pingdom_client.list_all_checks
+		end
+
+		context "no limit or offset specified" do
+			it "passes an empty query to #get_request" do
+				@pingdom_client.should_receive(:get_request).with do |*args|
+					args[1].should eq({})
+				end
+				@pingdom_client.list_all_checks
+			end
+		end
+
+		context "limit specified, but not offset" do
+			it "passes a query with the limit to #get_request" do
+				@pingdom_client.should_receive(:get_request).with do |*args|
+					args[1][:limit].should eq(10)
+				end
+				@pingdom_client.list_all_checks(limit: 10)
+			end
+
+			it "does not include an offset in the query" do
+				@pingdom_client.should_receive(:get_request).with do |*args|
+					args[1].keys.size.should eq(1)
+				end
+				@pingdom_client.list_all_checks(limit: 10)
+			end
+		end
+
+		context "offset specified, but not limit" do
+			it "passes a query with the offset to #get_request" do
+				@pingdom_client.should_receive(:get_request).with do |*args|
+					args[1][:offset].should eq(20)
+				end
+				@pingdom_client.list_all_checks(offset: 20)
+			end
+
+			it "does not include a limit in the query" do
+				@pingdom_client.should_receive(:get_request).with do |*args|
+					args[1].keys.size.should eq(1)
+				end
+				@pingdom_client.list_all_checks(offset: 20)
+			end
+		end
+
+		context "both limit and offset specified" do
+			it "includes offset in the query" do
+				@pingdom_client.should_receive(:get_request).with do |*args|
+					args[1][:offset].should eq(20)
+				end
+				@pingdom_client.list_all_checks(limit: 10, offset: 20)
+			end
+
+			it "includes limit in the query" do
+				@pingdom_client.should_receive(:get_request).with do |*args|
+					args[1][:limit].should eq(10)
+				end
+				@pingdom_client.list_all_checks(limit: 10, offset: 20)
+			end
+		end
+
+		it "returns the list of checks" do
+			@pingdom_client.list_all_checks.should eq(@fake_checks)
+		end
+	end
 end

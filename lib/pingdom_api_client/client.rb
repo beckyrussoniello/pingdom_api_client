@@ -1,6 +1,8 @@
 module PingdomApiClient
 	class Client
 		include HTTParty
+		include PingdomApiClient::Helpers
+
 		base_uri "https://api.pingdom.com/api/2.0/"
 	
 		attr_accessor :email, :password, :api_key, :agent_name
@@ -26,6 +28,10 @@ module PingdomApiClient
 				raise(PingdomApiClient::ApiError, "#{response.code}: #{body['error']['errormessage']}")
 			end
 			body
+		end
+
+		def list_all_checks(query = {}) # takes :limit and :offset
+			get_request(checks_path, query)["checks"]
 		end
 	end
 end

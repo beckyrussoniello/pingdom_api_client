@@ -4,13 +4,16 @@ module PingdomApiClient
 
 		attr_accessor :client, :name, :host, :type, :paused, :resolution, :pingdom_id
 
-		def initialize(options = {})
+		def initialize(client, options = {})
+			@client = client
+
 			options.each do |key, value|
 				eval "@#{key} = value if self.respond_to?(:#{key})"
 			end
 		end
 
-		def create
+		def upload
+			validate_attributes_for_upload
 			query = { name: name, host: host, type: type } 
 
 			[:resolution, :paused].each do |instance_var|
@@ -19,15 +22,6 @@ module PingdomApiClient
 			end
 
 			client.post_request(checks_path, query)
-		end
-
-		def self.list_all(client, limit = nil, offset = nil)
-			query = {}
-			[:limit, :offset].each do |param|
-				value = eval param.to_s
-				query[param] =  value if value
-			end
-			client.get_request(checks_path, query)["checks"]
 		end
 
 		def get_info
@@ -48,6 +42,26 @@ module PingdomApiClient
 
 		def delete!
 			client.delete_request(check_path, "")
+		end
+
+		def check_path
+			validate_pingdom_id_present
+			"checks/#{pingdom_id}"
+		end
+
+		private
+
+		def validate_attributes_for_upload
+			if [name, host, type].include? nil
+				raise AttributesMissing, "You must set the name, host, and type before uploading a new check to Pingdom."
+			end
+		end
+
+		def validate_pingdom_id_present
+			raise(AttributesMissing, "Pingdom id cannot be nil") unless pingdom_id
+		end
+
+		class AttributesMissing < StandardError
 		end
 	end
 end

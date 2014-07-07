@@ -63,7 +63,7 @@ module PingdomApiClient
 
 		def check_path
 			validate_pingdom_id_present
-			"checks/#{pingdom_id}"
+			"/checks/#{pingdom_id}"
 		end
 
 		private

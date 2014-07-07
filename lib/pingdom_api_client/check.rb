@@ -36,7 +36,7 @@ module PingdomApiClient
 
 		def outage_report(start_time)
 			query = { from: start_time.to_i, order: 'asc'}
-			path = "summary.outage/#{pingdom_id}"
+			path = "/summary.outage/#{pingdom_id}"
 			client.get_request(path, query)["summary"]["states"]
 		end
 

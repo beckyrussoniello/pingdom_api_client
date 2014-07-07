@@ -14,7 +14,7 @@ module PingdomApiClient
 
 		def upload
 			validate_attributes_for_upload
-			query = { name: name, host: host, type: type } 
+			query = { name: name, host: host, type: type }
 
 			[:resolution, :paused].each do |instance_var|
 				value = send(instance_var)
@@ -38,6 +38,11 @@ module PingdomApiClient
 
 		def unpause
 			modify(paused: false)
+		end
+
+		def assign_to_alert_policy(alert_policy_id)
+			query = { alert_policy: alert_policy_id, use_legacy_notifications: false }
+			modify(query)
 		end
 
 		def delete!

@@ -240,7 +240,7 @@ describe PingdomApiClient::Check do
 		end
 	end
 
-	describe "unpause" do
+	describe "#unpause" do
 		before :each do
 			@query = {paused: false}
 		end
@@ -248,6 +248,26 @@ describe PingdomApiClient::Check do
 		it "calls #modify, passing in {paused: true}" do
 			@check.should_receive(:modify).with(@query)
 			@check.unpause
+		end
+	end
+
+	describe "#assign_to_alert_policy" do
+		before :each do
+			@alert_policy_id = 12345
+		end
+
+		it "calls #modify, passing in the alert policy id" do
+			@check.should_receive(:modify).with do |*args|
+				args[0][:alert_policy].should eq(@alert_policy_id)
+			end
+			@check.assign_to_alert_policy(@alert_policy_id)
+		end
+
+		it "does not use legacy notifications" do
+			@check.should_receive(:modify).with do |*args|
+				args[0][:use_legacy_notifications].should be_false
+			end
+			@check.assign_to_alert_policy(@alert_policy_id)
 		end
 	end
 

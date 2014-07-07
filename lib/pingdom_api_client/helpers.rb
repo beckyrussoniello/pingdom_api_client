@@ -2,7 +2,7 @@ module PingdomApiClient
 	module Helpers
 
 		def checks_path
-			"checks"
+			"/checks"
 		end
 	end
 end

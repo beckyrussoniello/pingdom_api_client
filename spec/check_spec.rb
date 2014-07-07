@@ -65,7 +65,8 @@ describe PingdomApiClient::Check do
 
 	describe "#upload" do
 		before :each do
-			@client.stub(:post_request)
+			@expected_response = { "check" => { "id" => 123456 }}
+			@client.stub(:post_request).and_return(@expected_response)
 		end
 
 		it "calls #validate_attributes_for_upload" do
@@ -164,6 +165,18 @@ describe PingdomApiClient::Check do
 					(args[1].keys & [:resolution, :paused]).should eq([:resolution, :paused])
 				end
 				@check.upload
+			end
+		end
+
+		context "unexpected response body" do
+			before :each do
+				@client.stub(:post_request).and_return({something: "else"})
+			end
+
+			it "raises an error" do
+				expect{
+					@check.upload
+				}.to raise_error(PingdomApiClient::ApiError, "Unexpected response body")
 			end
 		end
 	end

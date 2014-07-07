@@ -2,7 +2,8 @@ module PingdomApiClient
 	class Check
 		include PingdomApiClient::Helpers
 
-		attr_accessor :client, :name, :host, :type, :paused, :resolution, :pingdom_id
+		attr_accessor :client, :name, :host, :type, :paused, :resolution, :pingdom_id,
+			:sendnotificationwhendown, :sendtoemail
 
 		def initialize(client, options = {})
 			@client = client
@@ -16,12 +17,17 @@ module PingdomApiClient
 			validate_attributes_for_upload
 			query = { name: name, host: host, type: type }
 
-			[:resolution, :paused].each do |instance_var|
+			[:resolution, :paused, :sendnotificationwhendown, :sendtoemail].each do |instance_var|
 				value = send(instance_var)
 				query[instance_var] = value if value
 			end
 
-			client.post_request(checks_path, query)
+			response = client.post_request(checks_path, query)
+			unless response["check"] && response["check"]["id"]
+				raise(PingdomApiClient::ApiError, "Unexpected response body")
+			end
+			
+			response
 		end
 
 		def get_info

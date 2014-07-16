@@ -26,7 +26,7 @@ module PingdomApiClient
 			unless response["check"] && response["check"]["id"]
 				raise(PingdomApiClient::ApiError, "Unexpected response body")
 			end
-			
+			self.pingdom_id = response["check"]["id"]
 			response
 		end
 
